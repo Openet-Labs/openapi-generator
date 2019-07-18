@@ -18,6 +18,7 @@
 package org.openapitools.codegen;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
@@ -37,6 +38,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.models.media.XML;
 
@@ -63,7 +65,20 @@ public class InlineModelResolver {
         if (paths != null) {
             for (String pathname : paths.keySet()) {
                 PathItem path = paths.get(pathname);
+                List<Operation> allOperations = new ArrayList<>(path.readOperations());
+
+                // Include callback operation as well
                 for (Operation operation : path.readOperations()) {
+                    Map<String, Callback> callbacks = operation.getCallbacks();
+                    if (callbacks != null) {
+                        allOperations.addAll(callbacks.values().stream()
+                                .flatMap(callback -> callback.values().stream())
+                                .flatMap(pathItem -> pathItem.readOperations().stream())
+                                .collect(Collectors.toList()));
+                    }
+                }
+
+                for (Operation operation : allOperations) {
                     RequestBody requestBody = operation.getRequestBody();
                     if (requestBody != null) {
                         Schema model = ModelUtils.getSchemaFromRequestBody(requestBody);
