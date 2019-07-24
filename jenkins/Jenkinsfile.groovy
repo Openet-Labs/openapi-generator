@@ -53,30 +53,12 @@ pipeline {
               mavenArtiRun artiMavenMap, "clean install"
           }
         }
-//        stage('sanity-test') {
-//          steps {
-//            sh 'cd test && export PATH=/opt/maven/bin:$PATH && ./test.sh -Dmaven.repo.local=${WORKSPACE}/.repository'
-//            sh 'cd $WORKSPACE'
-//          }
-//        }
         stage('Publish Maven Artifact') {
-
             steps {
                 mavenArtiDeploy artiMavenMap
                 mavenArtiNextVersion artiMavenMap
             }
         }
-        stage('Build name Update if Releasing') {
-            when {
-                expression { return PERFORM_RELEASE == 'true' }
-            }
-            steps {
-              script {
-                currentBuild.displayName = "${GIT_BRANCH}_RELEASED"
-              }
-            }
-        }
-
     }
     post {
         always {
