@@ -429,6 +429,8 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
 
                 Schema schema = schemas.get(name);
 
+                // Revert old behaviour to generate map and array as model
+                /*
                 // check to see if it's a "map" model
                 if (ModelUtils.isMapSchema(schema)) {
                     if (schema.getProperties() == null || schema.getProperties().isEmpty()) {
@@ -446,6 +448,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                         continue;
                     }
                 }
+                */
 
                 Map<String, Schema> schemaMap = new HashMap<>();
                 schemaMap.put(name, schema);
