@@ -2801,8 +2801,18 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.vendorExtensions.putAll(parameter.getExtensions());
         }
 
-        if (parameter.getSchema() != null) {
-            Schema parameterSchema = parameter.getSchema();
+        Schema parameterSchema = parameter.getSchema();
+        if (parameter.getSchema() == null) {
+            Content content = parameter.getContent();
+            if (content != null) {
+                MediaType applicationJson = content.get("application/json");
+                if (applicationJson != null) {
+                    parameterSchema = applicationJson.getSchema();
+                }
+            }
+        }
+
+        if (parameterSchema != null) {
             if (parameterSchema == null) {
                 LOGGER.warn("warning!  Schema not found for parameter \"" + parameter.getName() + "\", using String");
                 parameterSchema = new StringSchema().description("//TODO automatically added by openapi-generator due to missing type definition.");
